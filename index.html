@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Time Management</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Планировщик дня</h1>
+    <p class="subtitle">24-часовой циферблат — зажми и протяни, чтобы выделить время</p>
+    <button id="alerts-toggle" class="alerts-toggle" type="button">🔔 Включить напоминания</button>
+    <a href="resource.html" class="alerts-toggle" style="text-decoration:none;margin-left:8px">📊 Мой ресурс</a>
+  </header>
+
+  <section id="prayer-panel" class="prayer-panel">
+    <div class="prayer-loading">загрузка…</div>
+  </section>
+
+  <main class="layout">
+    <section class="chart-block">
+      <div class="clock-wrap">
+        <svg id="clock" viewBox="-30 -30 560 560" xmlns="http://www.w3.org/2000/svg">
+          <g id="ring-bg"></g>
+          <g id="ticks"></g>
+          <g id="sleep-hint"></g>
+          <g id="numbers"></g>
+          <g id="sectors"></g>
+          <g id="prayers"></g>
+          <g id="now-indicator"></g>
+          <g id="prayer-countdown"></g>
+          <g id="preview"></g>
+          <circle id="center-dot" cx="250" cy="250" r="4"></circle>
+          <text id="now-label" x="250" y="250" text-anchor="middle">--:--</text>
+        </svg>
+
+        <div id="task-editor" class="task-editor hidden">
+          <div class="editor-time" id="editor-time"></div>
+          <input type="text" id="editor-name" placeholder="Название дела" maxlength="40" autocomplete="off">
+          <div class="editor-actions">
+            <button type="button" id="editor-cancel" class="ghost">Отмена</button>
+            <button type="button" id="editor-save">Сохранить</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="side">
+      <div id="calendar" class="calendar">
+        <div class="cal-header">
+          <button type="button" id="cal-prev" class="cal-nav">‹</button>
+          <div id="cal-title" class="cal-title"></div>
+          <button type="button" id="cal-next" class="cal-nav">›</button>
+        </div>
+        <div class="cal-weekdays">
+          <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span>
+          <span class="cal-rest-head">Пт</span><span>Сб</span><span>Вс</span>
+        </div>
+        <div id="cal-days" class="cal-days"></div>
+        <div class="cal-hint">Пятница — день отдыха. Кликни, чтобы отметить.</div>
+      </div>
+      <ul id="task-list" class="task-list"></ul>
+    </section>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

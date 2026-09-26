@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Твой ресурс</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="resource.css">
+</head>
+<body>
+  <header>
+    <h1>Твой ресурс</h1>
+    <p class="subtitle">Масштаб дохода и свободного времени в контексте Актобе / РК · 2026</p>
+    <a href="index.html" class="back-link">← к планировщику</a>
+  </header>
+
+  <main class="res-layout">
+
+    <section class="res-headline">
+      <div class="metric big">
+        <div class="metric-value" id="income-value">500 000 ₸</div>
+        <div class="metric-label">доход в месяц</div>
+        <div class="metric-sub" id="income-fx">≈ $1 050 · €960</div>
+      </div>
+      <div class="metric big">
+        <div class="metric-value" id="rate-value">5 682 ₸/ч</div>
+        <div class="metric-label">эффективная ставка</div>
+        <div class="metric-sub">4 ч × 22 рабочих дня</div>
+      </div>
+      <div class="metric big highlight">
+        <div class="metric-value" id="free-value">+120 ч/мес</div>
+        <div class="metric-label">свободного времени</div>
+        <div class="metric-sub">против полного дня 8 ч</div>
+      </div>
+    </section>
+
+    <section class="res-block">
+      <h2>Как ты живёшь по сравнению с медианой Актобе</h2>
+      <div class="bars" id="income-bars"></div>
+      <p class="note">Медианные значения приблизительные (Bureau of Statistics, hh.kz, оценки 2026). Реальность может отличаться на ±20%.</p>
+    </section>
+
+    <section class="res-block">
+      <h2>Как выглядит твой день</h2>
+      <div class="day-compare">
+        <div class="clock-mini">
+          <svg viewBox="0 0 200 200" id="day-yours"></svg>
+          <div class="clock-title">Ты</div>
+          <div class="clock-legend">
+            <span><i style="background:#6366f1"></i>Сон 8 ч</span>
+            <span><i style="background:#ef4444"></i>Работа 4 ч</span>
+            <span><i style="background:#10b981"></i>Свободно 12 ч</span>
+          </div>
+        </div>
+        <div class="clock-mini">
+          <svg viewBox="0 0 200 200" id="day-typical"></svg>
+          <div class="clock-title">Средний офисник</div>
+          <div class="clock-legend">
+            <span><i style="background:#6366f1"></i>Сон 7 ч</span>
+            <span><i style="background:#ef4444"></i>Работа 9 ч</span>
+            <span><i style="background:#f59e0b"></i>Дорога 2 ч</span>
+            <span><i style="background:#10b981"></i>Свободно 6 ч</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="res-block">
+      <h2>Что покрывает 500 000 ₸ в Актобе</h2>
+      <div class="cost-grid" id="cost-grid"></div>
+      <p class="note">Средние цены Актобе на осень 2026. Оценка: если тратить как средняя семья, у тебя остаётся ~200–250 тыс на накопления и цели.</p>
+    </section>
+
+    <section class="res-block">
+      <h2>Итог</h2>
+      <ul class="takeaways">
+        <li><b>Деньги:</b> ты в верхних ~20% по зарплате в Актобе. Уровень ~senior IT или руководителя среднего звена.</li>
+        <li><b>Время:</b> у тебя есть ресурс, которого нет почти ни у кого — <b>~15 дополнительных полных дней</b> в месяц по сравнению с обычной 8-часовой работой.</li>
+        <li><b>Ставка:</b> ты продаёшь час своего труда почти в 3 раза дороже средней. Не сливай его на дешёвые вещи.</li>
+        <li><b>Опасность:</b> при таком доходе легко жить «на 100%». Каждый месяц без накоплений — упущенный ресурс.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <script src="resource.js"></script>
+</body>
+</html>
