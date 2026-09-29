@@ -55,10 +55,10 @@ header h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.02em; }
 
 .omnitrix-hex {
   position: relative;
-  width: 22%;
+  width: 30%;
   aspect-ratio: 1;
   background: #a3e635;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  clip-path: polygon(0% 0%, 100% 0%, 62% 50%, 100% 100%, 0% 100%, 38% 50%);
   filter: drop-shadow(0 0 12px rgba(163, 230, 53, 0.95));
   transform: scale(0) rotate(-180deg);
 }
