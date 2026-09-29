@@ -4,15 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Time Management</title>
-  <link rel="stylesheet" href="styles.css?v=37">
+  <link rel="stylesheet" href="styles.css?v=38">
 </head>
 <body>
-  <div id="omnitrix-boot" class="omnitrix-boot" aria-hidden="true">
-    <div class="omnitrix-inner">
-      <div class="omnitrix-hex"></div>
-    </div>
-  </div>
-
   <section id="prayer-panel" class="prayer-panel">
     <div class="prayer-loading">загрузка…</div>
   </section>
@@ -33,6 +27,11 @@
           <circle id="center-dot" cx="250" cy="250" r="4"></circle>
           <text id="now-label" x="250" y="250" text-anchor="middle">--:--</text>
         </svg>
+
+        <div id="omnitrix-boot" class="omnitrix-boot" aria-hidden="true">
+          <div class="omnitrix-glow"></div>
+          <div class="omnitrix-hex"></div>
+        </div>
 
         <div id="task-editor" class="task-editor hidden">
           <div class="editor-time" id="editor-time"></div>
@@ -65,6 +64,6 @@
   </main>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="app.js?v=37"></script>
+  <script src="app.js?v=38"></script>
 </body>
 </html>
