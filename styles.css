@@ -25,6 +25,75 @@ header { text-align: center; margin-bottom: 24px; }
 header h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.02em; }
 .subtitle { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
 
+.omnitrix-boot {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(163, 230, 53, 0.35) 0%, rgba(10, 15, 26, 0.85) 55%, rgba(10, 15, 26, 0) 100%);
+  opacity: 0;
+}
+
+.omnitrix-boot.active { animation: omni-flash 1.3s ease-out; }
+
+.omnitrix-inner {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: #0a0f1a;
+  border: 6px solid #a3e635;
+  box-shadow:
+    0 0 40px rgba(163, 230, 53, 0.95),
+    0 0 90px rgba(163, 230, 53, 0.6),
+    inset 0 0 30px rgba(163, 230, 53, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0);
+}
+
+.omnitrix-boot.active .omnitrix-inner {
+  animation: omni-scale 1.3s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+
+.omnitrix-hex {
+  width: 110px;
+  height: 110px;
+  background: #a3e635;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  filter: drop-shadow(0 0 10px rgba(163, 230, 53, 0.9));
+  transform: scale(0) rotate(0deg);
+}
+
+.omnitrix-boot.active .omnitrix-hex {
+  animation: omni-hex 1.3s ease-out;
+}
+
+@keyframes omni-flash {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes omni-scale {
+  0%   { transform: scale(0)   rotate(-90deg); }
+  40%  { transform: scale(1.15) rotate(0deg); }
+  55%  { transform: scale(1)   rotate(0deg); }
+  85%  { transform: scale(1)   rotate(0deg); }
+  100% { transform: scale(0.7) rotate(30deg); opacity: 0; }
+}
+
+@keyframes omni-hex {
+  0%   { transform: scale(0)  rotate(-180deg); }
+  55%  { transform: scale(1.2) rotate(0deg); }
+  70%  { transform: scale(1)  rotate(0deg); }
+  100% { transform: scale(1)  rotate(0deg); opacity: 0.8; }
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(320px, 720px) minmax(280px, 360px);
