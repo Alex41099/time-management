@@ -18,32 +18,12 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: radial-gradient(circle at 20% 0%, #1a2050 0%, var(--bg) 60%);
   color: var(--text);
-  padding: 32px 24px 64px;
+  padding: 16px 12px 48px;
 }
 
 header { text-align: center; margin-bottom: 24px; }
 header h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.02em; }
 .subtitle { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
-
-.alerts-toggle {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 8px 16px;
-  color: var(--text);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.alerts-toggle:hover { border-color: var(--accent); }
-
-.alerts-toggle.active {
-  background: rgba(108, 141, 255, 0.15);
-  border-color: var(--accent);
-  color: #b8c3ff;
-}
 
 .layout {
   display: grid;
@@ -54,10 +34,9 @@ header h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.02em; }
 }
 
 .chart-block {
-  background: var(--card);
-  border-radius: 24px;
-  padding: 20px;
-  border: 1px solid var(--border);
+  background: transparent;
+  border: none;
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -67,7 +46,7 @@ header h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.02em; }
 .clock-wrap {
   position: relative;
   width: 100%;
-  max-width: 500px;
+  max-width: 640px;
   aspect-ratio: 1;
 }
 
@@ -394,28 +373,6 @@ header h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.02em; }
   text-align: center;
   line-height: 1.4;
 }
-
-.hint {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px 18px;
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.55;
-}
-
-.hint b {
-  color: var(--text);
-  display: block;
-  margin-bottom: 8px;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.hint ol { margin: 0; padding-left: 18px; }
-.hint li { margin-bottom: 4px; }
 
 .prayer-panel {
   max-width: 920px;

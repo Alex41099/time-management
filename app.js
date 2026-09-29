@@ -29,8 +29,6 @@ $(function () {
   const $editorName = $('#editor-name');
   const $editorTime = $('#editor-time');
 
-  const ALERTS_ENABLED_KEY = 'alerts-enabled';
-  const ALERTS_FIRED_KEY = 'alerts-fired';
   const CAL_REST_KEY = 'calendar-rested';
   const MONTH_NAMES_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
   const HABITS_LOG_KEY = 'habits-log';
@@ -51,8 +49,6 @@ $(function () {
 
   let tasks = load();
   let prayers = [];
-  let alertsEnabled = localStorage.getItem(ALERTS_ENABLED_KEY) === '1';
-  let audioCtx = null;
   let calCursor = null;
 
   let dragging = false;
@@ -67,7 +63,6 @@ $(function () {
   loadPrayers();
   renderNow();
   setInterval(renderNow, 15000);
-  initAlerts();
   initCalendar();
   initHabits();
 
@@ -704,11 +699,6 @@ $(function () {
     parent.appendChild(g);
   }
 
-  function shortPrayerName(name) {
-    if (name.indexOf('Аср') === 0) return 'А';
-    return name.charAt(0);
-  }
-
   function renderPrayerPanel() {
     const $panel = $('#prayer-panel');
     $panel.empty();
@@ -849,124 +839,6 @@ $(function () {
       return raw.list;
     } catch (e) {
       return null;
-    }
-  }
-
-  function initAlerts() {
-    updateAlertsButton();
-    $('#alerts-toggle').on('click', function () {
-      if (alertsEnabled) {
-        alertsEnabled = false;
-        localStorage.setItem(ALERTS_ENABLED_KEY, '0');
-        updateAlertsButton();
-      } else {
-        enableAlerts();
-      }
-    });
-    setInterval(checkAlerts, 30000);
-    checkAlerts();
-  }
-
-  function enableAlerts() {
-    ensureAudioCtx();
-    playBeep();
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().then(function () {
-        alertsEnabled = true;
-        localStorage.setItem(ALERTS_ENABLED_KEY, '1');
-        updateAlertsButton();
-      });
-    } else {
-      alertsEnabled = true;
-      localStorage.setItem(ALERTS_ENABLED_KEY, '1');
-      updateAlertsButton();
-    }
-    if ('vibrate' in navigator) navigator.vibrate(50);
-  }
-
-  function updateAlertsButton() {
-    const $btn = $('#alerts-toggle');
-    if (alertsEnabled) {
-      $btn.addClass('active').text('🔔 Напоминания включены');
-    } else {
-      $btn.removeClass('active').text('🔔 Включить напоминания');
-    }
-  }
-
-  function ensureAudioCtx() {
-    if (audioCtx) return;
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    if (Ctx) audioCtx = new Ctx();
-  }
-
-  function playBeep() {
-    try {
-      ensureAudioCtx();
-      if (!audioCtx) return;
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const now = audioCtx.currentTime;
-      [0, 0.18].forEach(function (offset) {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = 880;
-        gain.gain.setValueAtTime(0.0001, now + offset);
-        gain.gain.exponentialRampToValueAtTime(0.35, now + offset + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.25);
-        osc.connect(gain).connect(audioCtx.destination);
-        osc.start(now + offset);
-        osc.stop(now + offset + 0.3);
-      });
-    } catch (e) {}
-  }
-
-  function checkAlerts() {
-    if (!alertsEnabled) return;
-    if (!prayers.length) return;
-
-    const nowMin = currentMinuteOfDay();
-    const targets = [
-      { key: 'eat', name: 'Успеть поесть', title: 'До закрытия окна еды 30 мин', body: 'Успей поесть, дальше — «не есть»' },
-      { key: 'glasses', name: 'Магриб', title: 'Магриб — надень очки', body: 'Blue-light очки на нос' }
-    ];
-
-    const today = new Date().toDateString();
-    const fired = getFired();
-    let changed = false;
-
-    targets.forEach(function (t) {
-      const p = prayers.find(x => x.name === t.name);
-      if (!p || !Number.isFinite(p.min)) return;
-      if (nowMin < p.min || nowMin > p.min + 2) return;
-      const firedKey = t.key + '-' + today;
-      if (fired[firedKey]) return;
-      fired[firedKey] = true;
-      changed = true;
-      fireNotification(t.title, t.body);
-    });
-
-    if (changed) {
-      const trimmed = {};
-      Object.keys(fired).forEach(k => {
-        if (k.endsWith(today)) trimmed[k] = true;
-      });
-      localStorage.setItem(ALERTS_FIRED_KEY, JSON.stringify(trimmed));
-    }
-  }
-
-  function fireNotification(title, body) {
-    playBeep();
-    if ('vibrate' in navigator) navigator.vibrate([200, 80, 200]);
-    if ('Notification' in window && Notification.permission === 'granted') {
-      try { new Notification(title, { body: body, icon: '' }); } catch (e) {}
-    }
-  }
-
-  function getFired() {
-    try {
-      return JSON.parse(localStorage.getItem(ALERTS_FIRED_KEY)) || {};
-    } catch (e) {
-      return {};
     }
   }
 
