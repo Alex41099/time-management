@@ -1,6 +1,6 @@
 $(function () {
   const STORAGE_KEY = 'time-management-tasks-v4';
-  const PRAYERS_CACHE_KEY = 'prayers-cache-aktobe-v16';
+  const PRAYERS_CACHE_KEY = 'prayers-cache-aktobe-v19';
   const ASR_MODE_KEY = 'asr-mode';
   const AKTOBE_LAT = '50.300377';
   const AKTOBE_LNG = '57.154555';
@@ -33,6 +33,21 @@ $(function () {
   const ALERTS_FIRED_KEY = 'alerts-fired';
   const CAL_REST_KEY = 'calendar-rested';
   const MONTH_NAMES_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  const HABITS_LOG_KEY = 'habits-log';
+  const HABIT_MIN_PER_DAY = 5;
+  const HABIT_MILESTONES = [7, 30, 100, 365];
+  const HABIT_LEVELS = [
+    { min: 0,   name: 'Новичок' },
+    { min: 7,   name: 'Стабильно' },
+    { min: 30,  name: 'Знаток' },
+    { min: 100, name: 'Мастер' },
+    { min: 365, name: 'Легенда' }
+  ];
+  const HABITS = [
+    { id: 'belly',   icon: '🧘', title: 'Массаж живота', color: '#f472b6', goal: 'Прямая осанка, плоский живот, лёгкость в теле' },
+    { id: 'quran',   icon: '📖', title: 'Чтение Корана', color: '#10b981', goal: 'Духовная сила, внутренний покой, связь с Всевышним' },
+    { id: 'lecture', icon: '🎧', title: 'Слушать лекции', color: '#6c8dff', goal: 'Знания копятся каждый день — умнее, чем вчера' }
+  ];
 
   let tasks = load();
   let prayers = [];
@@ -54,6 +69,7 @@ $(function () {
   setInterval(renderNow, 15000);
   initAlerts();
   initCalendar();
+  initHabits();
 
   $svg.on('mousedown touchstart', function (e) {
     if (!$editor.hasClass('hidden')) return;
@@ -470,11 +486,11 @@ $(function () {
         { name: 'Успеть поесть', color: '#84cc16', min: eatStart, routine: true,
           arc: Number.isFinite(eatStart) && Number.isFinite(fastStart)
             ? { startMin: eatStart, endMin: fastStart, color: '#84cc16' } : null },
-        { name: 'Не есть',       color: '#f97316', min: fastStart, routine: true,
+        { name: 'Не есть',       color: '#dc2626', min: fastStart, routine: true,
           arc: Number.isFinite(fastStart) && Number.isFinite(sleepStart)
-            ? { startMin: fastStart, endMin: sleepStart, color: '#92400e' } : null },
+            ? { startMin: fastStart, endMin: sleepStart, color: '#dc2626' } : null },
         { name: 'Сон',           color: '#6366f1', min: sleepStart, routine: true },
-        { name: 'Дневной сон',   color: '#6366f1', min: 14 * 60 + 30, routine: true }
+        { name: 'Дневной сон',   color: '#6366f1', min: 14 * 60, routine: true }
       ].filter(p => p && (p.range ? Number.isFinite(p.startMin) && Number.isFinite(p.endMin) : Number.isFinite(p.min)));
 
       applyAsrMode();
@@ -549,7 +565,22 @@ $(function () {
 
     drawHintSector(ishaWindowStart, ishaWindowEnd, '#10b981', 0.4, $g);
     drawHintSector(sleepStart, sleepEnd, '#6366f1', 0.4, $g);
-    drawHintSector(14 * 60 + 30, 15 * 60, '#6366f1', 0.4, $g);
+    drawHintSector(14 * 60, 14 * 60 + 25, '#6366f1', 0.4, $g);
+
+    drawHintLabel(sleepStart, sleepEnd, '#818cf8', $g);
+  }
+
+  function drawHintLabel(startMin, endMin, color, $g) {
+    const startSlot = startMin / STEP_MIN;
+    const startAngle = slotToAngle(startSlot);
+    const pos = polar(CENTER, CENTER, RING_IN - 42, startAngle);
+    const label = document.createElementNS(SVG_NS, 'text');
+    label.setAttribute('x', pos.x);
+    label.setAttribute('y', pos.y);
+    label.setAttribute('class', 'arc-label');
+    label.setAttribute('fill', color);
+    label.textContent = formatTime(startMin);
+    $g[0].appendChild(label);
   }
 
   function drawHintSector(startMin, endMin, color, opacity, $g) {
@@ -584,6 +615,16 @@ $(function () {
         path.setAttribute('opacity', '0.75');
         path.setAttribute('pointer-events', 'none');
         $g[0].appendChild(path);
+
+        const startAngle = slotToAngle(startSlot);
+        const arcLabelPos = polar(CENTER, CENTER, RING_IN - 42, startAngle);
+        const arcLabel = document.createElementNS(SVG_NS, 'text');
+        arcLabel.setAttribute('x', arcLabelPos.x);
+        arcLabel.setAttribute('y', arcLabelPos.y);
+        arcLabel.setAttribute('class', 'arc-label');
+        arcLabel.setAttribute('fill', p.arc.color);
+        arcLabel.textContent = formatTime(p.arc.startMin);
+        $g[0].appendChild(arcLabel);
       }
 
       if (p.muted || p.routine || p.hidden) return;
@@ -600,6 +641,16 @@ $(function () {
         path.setAttribute('opacity', '0.7');
         path.setAttribute('pointer-events', 'none');
         $g[0].appendChild(path);
+
+        const rangeStartAngle = slotToAngle(startSlot);
+        const rangeLabelPos = polar(CENTER, CENTER, RING_IN - 42, rangeStartAngle);
+        const rangeLabel = document.createElementNS(SVG_NS, 'text');
+        rangeLabel.setAttribute('x', rangeLabelPos.x);
+        rangeLabel.setAttribute('y', rangeLabelPos.y);
+        rangeLabel.setAttribute('class', 'arc-label');
+        rangeLabel.setAttribute('fill', p.color);
+        rangeLabel.textContent = formatTime(p.startMin);
+        $g[0].appendChild(rangeLabel);
         return;
       }
 
@@ -660,7 +711,7 @@ $(function () {
 
   function renderPrayerPanel() {
     const $panel = $('#prayer-panel');
-    $panel.find('.prayer-loading, .prayer-error, .prayer-group').remove();
+    $panel.empty();
 
     if (prayers.length === 0) {
       $panel.append('<div class="prayer-error">не удалось загрузить</div>');
@@ -672,9 +723,6 @@ $(function () {
     const routine = prayers.filter(p => p.routine);
     const next = namaz.find(p => !p.muted && !p.range && p.min > nowMin);
 
-    if (routine.length) {
-      $panel.append(buildPrayerGroup('Режим', routine, null));
-    }
   }
 
   function buildPrayerGroup(title, list, next) {
@@ -759,9 +807,9 @@ $(function () {
       minsLeft = (next.min + DAY_MIN) - nowMin;
     }
 
-    const x = CENTER - 70;
-    const yTop = CENTER + 65;
-    const yBot = CENTER + 85;
+    const x = CENTER;
+    const yTop = CENTER + 32;
+    const yBot = CENTER + 55;
 
     const l1 = document.createElementNS(SVG_NS, 'text');
     l1.setAttribute('x', x);
@@ -981,6 +1029,159 @@ $(function () {
   function getRested() {
     try {
       return JSON.parse(localStorage.getItem(CAL_REST_KEY)) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function initHabits() {
+    renderHabits();
+    $('#habits').on('click', '.habit-btn', function (e) {
+      const $card = $(this).closest('.habit-card');
+      const id = $card.data('id');
+      const wasDone = $card.hasClass('done');
+      toggleHabit(id);
+      if (!wasDone) spawnConfetti($card, e);
+    });
+  }
+
+  function renderHabits() {
+    const $box = $('#habits').empty();
+    const log = getHabitsLog();
+    const today = habitDateKey(new Date());
+
+    HABITS.forEach(function (h) {
+      const record = log[h.id] || {};
+      const done = !!record[today];
+      const streak = computeHabitStreak(record, done);
+      const totalDays = Object.keys(record).length;
+      const totalMin = totalDays * HABIT_MIN_PER_DAY;
+      const nextMilestone = HABIT_MILESTONES.find(m => streak < m) || HABIT_MILESTONES[HABIT_MILESTONES.length - 1];
+      const prevMilestone = HABIT_MILESTONES.slice().reverse().find(m => streak >= m) || 0;
+      const progress = (streak - prevMilestone) / (nextMilestone - prevMilestone);
+      const level = HABIT_LEVELS.slice().reverse().find(l => streak >= l.min).name;
+
+      const $card = $('<div class="habit-card">')
+        .attr('data-id', h.id).data('id', h.id)
+        .css('--habit-color', h.color);
+      if (done) $card.addClass('done');
+
+      const $top = $('<div class="habit-top">');
+      $top.append(buildHabitRing(h.icon, progress));
+      const $info = $('<div class="habit-body">');
+      $info.append($('<h4>').text(h.title));
+      $info.append($('<div class="habit-level">').text(level + ' · до ' + nextMilestone + ' дней'));
+      $top.append($info);
+      $card.append($top);
+
+      $card.append($('<div class="habit-goal">').text(h.goal));
+
+      const $stats = $('<div class="habit-stats">');
+      $stats.append($('<div class="habit-stat">')
+        .append($('<span class="val">').text('🔥 ' + streak))
+        .append($('<span class="lbl">').text('дней подряд')));
+      $stats.append($('<div class="habit-stat">')
+        .append($('<span class="val">').text(formatMinutes(totalMin)))
+        .append($('<span class="lbl">').text('вложено')));
+      $card.append($stats);
+
+      $card.append(buildHeatmap(record));
+
+      $card.append($('<button class="habit-btn" type="button">').text(done ? 'Сделано сегодня' : 'Отметить сегодня'));
+      $box.append($card);
+    });
+  }
+
+  function buildHabitRing(icon, progress) {
+    const $wrap = $('<div class="habit-ring">');
+    const r = 24;
+    const c = 2 * Math.PI * r;
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 54 54');
+
+    const bg = document.createElementNS(SVG_NS, 'circle');
+    bg.setAttribute('cx', 27); bg.setAttribute('cy', 27); bg.setAttribute('r', r);
+    bg.setAttribute('class', 'ring-bg-circle');
+    svg.appendChild(bg);
+
+    const fg = document.createElementNS(SVG_NS, 'circle');
+    fg.setAttribute('cx', 27); fg.setAttribute('cy', 27); fg.setAttribute('r', r);
+    fg.setAttribute('class', 'ring-fg-circle');
+    fg.setAttribute('stroke-dasharray', c);
+    fg.setAttribute('stroke-dashoffset', c * (1 - Math.max(0, Math.min(1, progress))));
+    svg.appendChild(fg);
+
+    $wrap[0].appendChild(svg);
+    $wrap.append($('<span class="ring-icon">').text(icon));
+    return $wrap;
+  }
+
+  function buildHeatmap(record) {
+    const $map = $('<div class="habit-heatmap">');
+    const today = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = habitDateKey(d);
+      const cls = 'cell' + (record[key] ? ' done' : '') + (i === 0 ? ' today' : '');
+      $map.append($('<div>').attr('class', cls).attr('title', key));
+    }
+    return $map;
+  }
+
+  function formatMinutes(m) {
+    if (m < 60) return m + ' мин';
+    const h = Math.floor(m / 60);
+    return h + ' ч';
+  }
+
+  function spawnConfetti($card, e) {
+    const emojis = ['✨', '🔥', '⭐', '💫', '🎉'];
+    const cardRect = $card[0].getBoundingClientRect();
+    const originX = (e.clientX || cardRect.left + cardRect.width / 2) - cardRect.left;
+    const originY = (e.clientY || cardRect.top + cardRect.height / 2) - cardRect.top;
+    for (let i = 0; i < 8; i++) {
+      const $c = $('<span class="habit-confetti">')
+        .text(emojis[i % emojis.length])
+        .css({
+          left: originX + 'px',
+          top: originY + 'px',
+          '--dx': (Math.random() * 160 - 80) + 'px',
+          '--dy': (Math.random() * -120 - 20) + 'px'
+        });
+      $card.append($c);
+      setTimeout(function () { $c.remove(); }, 950);
+    }
+  }
+
+  function toggleHabit(id) {
+    const log = getHabitsLog();
+    const today = habitDateKey(new Date());
+    if (!log[id]) log[id] = {};
+    if (log[id][today]) delete log[id][today];
+    else log[id][today] = true;
+    localStorage.setItem(HABITS_LOG_KEY, JSON.stringify(log));
+    renderHabits();
+  }
+
+  function computeHabitStreak(record, doneToday) {
+    let streak = 0;
+    const d = new Date();
+    if (!doneToday) d.setDate(d.getDate() - 1);
+    while (record[habitDateKey(d)]) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    }
+    return streak;
+  }
+
+  function habitDateKey(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function getHabitsLog() {
+    try {
+      return JSON.parse(localStorage.getItem(HABITS_LOG_KEY)) || {};
     } catch (e) {
       return {};
     }
