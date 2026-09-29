@@ -61,10 +61,6 @@ $(function () {
   drawStatic();
   render();
   loadPrayers();
-  playOmnitrix();
-  document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) playOmnitrix();
-  });
   renderNow();
   setInterval(renderNow, 15000);
   initCalendar();
@@ -1061,14 +1057,6 @@ $(function () {
     } catch (e) {
       return {};
     }
-  }
-
-  function playOmnitrix() {
-    const el = document.getElementById('omnitrix-boot');
-    if (!el) return;
-    el.classList.remove('active');
-    void el.offsetWidth;
-    el.classList.add('active');
   }
 
   function save() {
